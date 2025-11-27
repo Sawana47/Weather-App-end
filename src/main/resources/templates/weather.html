@@ -20,12 +20,41 @@
                     <p class="card-text"><strong>Temperature:</strong> <span th:text="${temperature}">Temperature</span>°C</p>
                     <p class="card-text"><strong>Humidity:</strong> <span th:text="${humidity}">Humidity</span>%</p>
                     <p class="card-text"><strong>Wind Speed:</strong> <span th:text="${windSpeed}">Wind Speed</span> m/s</p>
+                    
+                    <!-- Activity Selection -->
+                    <div class="card-text mt-3">
+                        <label for="activity">Select Activity:</label>
+                        <select id="activity" class="form-control">
+                            <option value="">-- Choose an activity --</option>
+                            <option value="cycling">Cycling</option>
+                            <option value="running">Running</option>
+                            <option value="walking">Walking</option>
+                            <option value="office">Office Commute</option>
+                            <option value="trekking">Trekking / Hiking</option>
+                            <option value="gym">Gym Workout</option>
+                            <option value="outdoor sports">Outdoor Sports</option>
+                            <option value="driving">Driving</option>
+                            <option value="travelling">Travelling</option>
+                            <option value="kids">Kids Outdoor Safety</option>
+                            <option value="elderly">Elderly Safety</option>
+                        </select>
+                        <button class="btn btn-secondary btn-block mt-2" type="button" id="showActivitySuggestionBtn">
+                            Show Activity Suggestion
+                        </button>
+                    </div>
+
+                    <!-- Activity Suggestion Result -->
+                     <p class="card-text mt-3 d-none" id="activity-suggestion-text">
+                        <strong>Suggestion:</strong> <span></span>
+                    </p>
+                    
+                    
                     <button class="btn btn-primary btn-block" type="button" id="showSuggestionBtn">
                         Show Clothing Suggestion
                     </button>
-                    <p class="card-text mt-3" id="suggestionText" style="display: none;">
-                        <strong>Suggestion:</strong> <span th:text="${weatherSuggestion}">Suggestion</span>
-                    </p>
+                    <p class="card-text mt-3 d-none" id="suggestionText">
+    <strong>Suggestion:</strong> <span th:text="${weatherSuggestion}">Suggestion</span>
+</p>
                     
                     <a href="/" class="btn btn-secondary btn-block">Back</a>
                     <div th:if="${error}" class="alert alert-danger mt-3">
@@ -41,16 +70,49 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script th:inline="javascript">
+    const city = /*[[${city}]]*/ 'Unknown';
+</script>
 <script>
+    const toggleDisplay = (button, elementId, showText, hideText) => {
+        const el = document.getElementById(elementId);
+        el.classList.toggle('d-none');
+        button.textContent = el.classList.contains('d-none') ? showText : hideText;
+    };
+
     document.getElementById("showSuggestionBtn").addEventListener("click", function() {
-        var suggestion = document.getElementById("suggestionText");
-        if (suggestion.style.display === "none") {
-            suggestion.style.display = "block";
-            this.textContent = "Hide Clothing Suggestion";
-        } else {
-            suggestion.style.display = "none";
-            this.textContent = "Show Clothing Suggestion";
+        toggleDisplay(this, "suggestionText", "Show Clothing Suggestion", "Hide Clothing Suggestion");
+    });
+
+    document.getElementById("showActivitySuggestionBtn").addEventListener("click", function() {
+        const activitySelect = document.getElementById("activity");
+        const selectedActivity = activitySelect.value;
+
+        if (!selectedActivity) {
+            alert("Please select an activity first!");
+            return;
         }
+
+        const suggestionText = document.getElementById("activity-suggestion-text");
+        const suggestionSpan = suggestionText.querySelector("span");
+
+        if (!suggestionText.classList.contains('d-none')) {
+            suggestionText.classList.add('d-none');
+            this.textContent = "Show Activity Suggestion";
+            return;
+        }
+
+        fetch(`/activity-suggestion?city=${encodeURIComponent(city)}&activity=${encodeURIComponent(selectedActivity)}`)
+            .then(response => response.ok ? response.text() : Promise.reject('Network error'))
+            .then(data => {
+                suggestionSpan.textContent = data;
+                suggestionText.classList.remove('d-none');
+                this.textContent = "Hide Activity Suggestion";
+            })
+            .catch(error => {
+                suggestionSpan.textContent = "Error fetching suggestion.";
+                suggestionText.classList.remove('d-none');
+            });
     });
 </script>
 </body>
