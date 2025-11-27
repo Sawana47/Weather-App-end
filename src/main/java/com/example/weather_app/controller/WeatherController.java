@@ -1,6 +1,8 @@
 package com.example.weather_app.controller;
 
 import com.example.weather_app.model.WeatherResponse;
+import com.example.weather_app.service.WeatherClothingSuggestion;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +37,10 @@ public class WeatherController {
             model.addAttribute("windSpeed", weatherResponse.getWind().getSpeed());
             String weatherIcon = "wi wi-owm-" + weatherResponse.getWeather().get(0).getId();
             model.addAttribute("weatherIcon", weatherIcon);
+            String weatherSuggestion = WeatherClothingSuggestion.
+            		getClothingSuggestion(weatherResponse.getMain().getTemp(), weatherResponse.getWeather().get(0).getDescription(),
+            				weatherResponse.getWind().getSpeed());
+            model.addAttribute("weatherSuggestion", weatherSuggestion);
         } else {
             model.addAttribute("error", "City not found.");
         }

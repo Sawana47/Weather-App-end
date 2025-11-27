@@ -20,6 +20,13 @@
                     <p class="card-text"><strong>Temperature:</strong> <span th:text="${temperature}">Temperature</span>°C</p>
                     <p class="card-text"><strong>Humidity:</strong> <span th:text="${humidity}">Humidity</span>%</p>
                     <p class="card-text"><strong>Wind Speed:</strong> <span th:text="${windSpeed}">Wind Speed</span> m/s</p>
+                    <button class="btn btn-primary btn-block" type="button" id="showSuggestionBtn">
+                        Show Clothing Suggestion
+                    </button>
+                    <p class="card-text mt-3" id="suggestionText" style="display: none;">
+                        <strong>Suggestion:</strong> <span th:text="${weatherSuggestion}">Suggestion</span>
+                    </p>
+                    
                     <a href="/" class="btn btn-secondary btn-block">Back</a>
                     <div th:if="${error}" class="alert alert-danger mt-3">
                         <p>Error: <span th:text="${error}"></span></p>
@@ -34,5 +41,17 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById("showSuggestionBtn").addEventListener("click", function() {
+        var suggestion = document.getElementById("suggestionText");
+        if (suggestion.style.display === "none") {
+            suggestion.style.display = "block";
+            this.textContent = "Hide Clothing Suggestion";
+        } else {
+            suggestion.style.display = "none";
+            this.textContent = "Show Clothing Suggestion";
+        }
+    });
+</script>
 </body>
 </html>
